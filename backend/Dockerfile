@@ -47,5 +47,8 @@ ENV APP_ENV=production \
 # Generate optimized autoload files
 RUN composer dump-autoload --optimize
 
-# Default command: serve the Laravel app
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+# Copy entrypoint and use it to run migrate/seed then start app
+COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
