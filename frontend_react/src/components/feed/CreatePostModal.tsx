@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { X, Image as ImageIcon, Video, Mic, Music, Globe, Loader2 } from 'lucide-react';
+import { X, Image as ImageIcon, Video, Globe } from 'lucide-react';
 import { useUIStore } from '@/store/useUIStore';
 import { useAuthStore } from '@/store/useAuthStore';
 import { postService } from '@/services/postService';
@@ -9,7 +9,7 @@ interface CreatePostModalProps {
     onPostCreated?: (post: any) => void; // Optional callback if needed
 }
 
-export const CreatePostModal: React.FC<CreatePostModalProps> = ({ onPostCreated }) => {
+export const CreatePostModal: React.FC<CreatePostModalProps> = () => {
     const { isCreatePostOpen, closeCreatePost } = useUIStore();
     const { user } = useAuthStore();
     const [content, setContent] = useState('');
@@ -17,7 +17,6 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = ({ onPostCreated 
     const [media, setMedia] = useState<File | null>(null);
     const [mediaPreview, setMediaPreview] = useState<string | null>(null);
     const [mediaType, setMediaType] = useState<'image' | 'video' | 'audio' | 'music' | 'text'>('text');
-    const [isPosting, setIsPosting] = useState(false); // Local loading state just for the button/close
     
     const fileInputRef = useRef<HTMLInputElement>(null);
 

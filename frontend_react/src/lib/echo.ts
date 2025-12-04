@@ -16,15 +16,15 @@ export const echo = new Echo({
     cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
     forceTLS: true,
     
-    authorizer: (channel, options) => ({
+    authorizer: (channel) => ({
         authorize: (socketId, callback) => {
             import('@/lib/axios').then(({ default: api }) => {
                 api.post('/broadcasting/auth', {
                     socket_id: socketId,
                     channel_name: channel.name
                 })
-                    .then(res => callback(false, res.data))
-                    .catch(err => callback(true, err));
+                    .then(res => callback(null, res.data))
+                    .catch(err => callback(err, null));
             });
         },
     }),

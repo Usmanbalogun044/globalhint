@@ -95,7 +95,7 @@ export const NotificationList: React.FC = () => {
                         if (typeof data === 'string') {
                             try { data = JSON.parse(data); } catch (e) {}
                         }
-                        const { sender_name, sender_avatar, sender_username, type } = data;
+                        const { sender_name, sender_avatar, type } = data;
 
                         return (
                             <div 

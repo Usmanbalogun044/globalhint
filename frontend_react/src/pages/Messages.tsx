@@ -6,7 +6,7 @@ import { Chat } from '@/components/chat/Chat';
 import { Search } from 'lucide-react';
 
 export const Messages: React.FC = () => {
-    const { user } = useAuthStore();
+    // const { user } = useAuthStore();
     const [conversations, setConversations] = useState<User[]>([]);
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);

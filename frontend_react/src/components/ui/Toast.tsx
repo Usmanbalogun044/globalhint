@@ -14,7 +14,7 @@ export interface ToastProps {
     onClick?: () => void;
 }
 
-export const Toast: React.FC<ToastProps> = ({ message, type = 'info', sender, actionType, onClose, onClick }) => {
+export const Toast: React.FC<ToastProps> = ({ message, sender, actionType, onClose, onClick }) => {
     useEffect(() => {
         const timer = setTimeout(() => {
             onClose();
