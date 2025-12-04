@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuthStore } from '@/store/useAuthStore';
-import { Home, Search, Bell, User, LogIn } from 'lucide-react';
+import { Home, Search, Bell, User, LogIn, MessageSquare } from 'lucide-react';
 
 interface BottomNavProps {
     onOpenLogin: () => void;
@@ -29,8 +29,11 @@ export const BottomNav: React.FC<BottomNavProps> = ({ onOpenLogin }) => {
                         <Link to="/notifications" className={`p-2 rounded-full transition-colors ${isActive('/notifications') ? 'text-white' : 'text-gray-500'}`}>
                             <Bell size={28} strokeWidth={isActive('/notifications') ? 3 : 2} />
                         </Link>
-                        <Link to={`/profile/${user?.id}`} className={`p-2 rounded-full transition-colors ${isActive(`/profile/${user?.id}`) ? 'text-white' : 'text-gray-500'}`}>
-                            <User size={28} strokeWidth={isActive(`/profile/${user?.id}`) ? 3 : 2} />
+                        <Link to="/messages" className={`p-2 rounded-full transition-colors ${isActive('/messages') ? 'text-white' : 'text-gray-500'}`}>
+                            <MessageSquare size={28} strokeWidth={isActive('/messages') ? 3 : 2} />
+                        </Link>
+                        <Link to={`/profile/${user?.username}`} className={`p-2 rounded-full transition-colors ${isActive(`/profile/${user?.username}`) ? 'text-white' : 'text-gray-500'}`}>
+                            <User size={28} strokeWidth={isActive(`/profile/${user?.username}`) ? 3 : 2} />
                         </Link>
                     </>
                 ) : (

@@ -19,11 +19,19 @@ export const postService = {
         return response.data;
     },
 
-    async createPost(content: string, type: 'text' | 'image' | 'video' = 'text', mediaUrl?: string): Promise<Post> {
-        const response = await api.post('/posts', {
-            content,
-            type,
-            media_url: mediaUrl
+    async createPost(content: string, type: 'text' | 'image' | 'video' | 'audio' | 'music' = 'text', media?: File, category: string = 'General'): Promise<Post> {
+        const formData = new FormData();
+        formData.append('content', content);
+        formData.append('type', type);
+        formData.append('category', category);
+        if (media) {
+            formData.append('media', media);
+        }
+
+        const response = await api.post('/posts', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
         });
         return response.data;
     },

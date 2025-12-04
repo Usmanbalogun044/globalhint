@@ -12,6 +12,7 @@ class Post extends Model
     protected $fillable = [
         'user_id',
         'category_id',
+        'category',
         'content',
         'type',
         'media_url',
@@ -30,5 +31,10 @@ class Post extends Model
     public function votes()
     {
         return $this->hasMany(Vote::class);
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
     }
 }

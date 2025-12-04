@@ -3,13 +3,22 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Services\NotificationService;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-    public function show(User $user)
+    public function show($username)
     {
+        $user = User::where('username', $username)->firstOrFail();
         return response()->json($user->loadCount(['posts', 'followers', 'following']));
+    }
+
+    protected $notificationService;
+
+    public function __construct(NotificationService $notificationService)
+    {
+        $this->notificationService = $notificationService;
     }
 
     public function follow(Request $request, User $user)
@@ -28,6 +37,15 @@ class UserController extends Controller
             $user->id => ['type' => $request->type]
         ]);
 
+        // Trigger notification
+        $this->notificationService->create($user, 'shadow', [
+            'sender_id' => $currentUser->id,
+            'sender_name' => $currentUser->name,
+            'sender_username' => $currentUser->username,
+            'sender_avatar' => $currentUser->avatar,
+            'shadow_type' => $request->type,
+        ]);
+
         return response()->json(['message' => 'Followed successfully']);
     }
 
@@ -40,6 +58,6 @@ class UserController extends Controller
     public function suggested()
     {
         $users = User::inRandomOrder()->limit(5)->get();
-        return response()->json(['data' => $users]);
+        return response()->json($users);
     }
 }

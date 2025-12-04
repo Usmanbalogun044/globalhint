@@ -1,8 +1,10 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuthStore } from '@/store/useAuthStore';
-import { Home, Search, User, Bell, LogOut, LogIn, PenSquare } from 'lucide-react';
+import { useUIStore } from '@/store/useUIStore';
+import { Home, Search, User, Bell, LogOut, LogIn, PenSquare, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { NotificationBadge } from '@/components/notifications/NotificationBadge';
 
 interface SidebarProps {
     onOpenLogin: () => void;
@@ -11,13 +13,22 @@ interface SidebarProps {
 
 export const Sidebar: React.FC<SidebarProps> = ({ onOpenLogin, onOpenRegister }) => {
     const { user, isAuthenticated, logout } = useAuthStore();
+    const { openCreatePost } = useUIStore();
     const location = useLocation();
 
     const isActive = (path: string) => location.pathname === path;
 
+    const handleNewHintClick = () => {
+        if (isAuthenticated) {
+            openCreatePost();
+        } else {
+            onOpenLogin();
+        }
+    };
+
     return (
         <aside className="hidden md:flex flex-col w-20 lg:w-72 sticky top-0 h-screen border-r border-white/10 bg-black/20 backdrop-blur-xl z-40">
-            <div className="p-6 flex-1 overflow-y-auto">
+            <div className="p-6 flex-1 overflow-y-auto custom-scrollbar">
                 <Link to="/" className="flex items-center space-x-3 mb-8 group">
                     <div className="w-10 h-10 bg-gradient-to-tr from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/20 group-hover:scale-110 transition-transform duration-300">
                         <span className="text-2xl">🌍</span>
@@ -40,11 +51,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenLogin, onOpenRegister })
 
                     {isAuthenticated ? (
                         <>
-                            <Link to="/notifications" className="flex items-center space-x-4 p-3 rounded-xl text-gray-400 hover:text-white font-medium transition-all hover:bg-white/5 hover:scale-[1.02]">
-                                <Bell size={24} />
+                            <Link to="/notifications" className="flex items-center space-x-4 p-3 rounded-xl text-gray-400 hover:text-white font-medium transition-all hover:bg-white/5 hover:scale-[1.02] relative">
+                                <div className="relative">
+                                    <Bell size={24} />
+                                    <NotificationBadge />
+                                </div>
                                 <span className="font-medium text-lg hidden lg:block">Notifications</span>
                             </Link>
-                            <Link to={`/profile/${user?.id}`} className={`flex items-center space-x-4 p-3 rounded-xl transition-all hover:scale-[1.02] ${isActive(`/profile/${user?.id}`) ? 'bg-white/10 text-white' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`}>
+                            <Link to="/messages" className={`flex items-center space-x-4 p-3 rounded-xl transition-all hover:scale-[1.02] ${isActive('/messages') ? 'bg-white/10 text-white' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`}>
+                                <MessageSquare size={24} />
+                                <span className="font-medium text-lg hidden lg:block">ChatHint</span>
+                            </Link>
+                            <Link to={`/profile/${user?.username}`} className={`flex items-center space-x-4 p-3 rounded-xl transition-all hover:scale-[1.02] ${isActive(`/profile/${user?.username}`) ? 'bg-white/10 text-white' : 'text-gray-400 hover:bg-white/5 hover:text-white'}`}>
                                 <User size={24} />
                                 <span className="font-medium text-lg hidden lg:block">Profile</span>
                             </Link>
@@ -68,9 +86,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ onOpenLogin, onOpenRegister })
                 </nav>
 
                 <div className="mt-8">
-                    <Button className="w-full h-14 text-lg font-bold rounded-full shadow-xl shadow-indigo-500/20 hover:shadow-indigo-500/40 transition-all hover:scale-105">
+                    <Button 
+                        onClick={handleNewHintClick}
+                        className="w-full h-14 text-lg font-bold rounded-full shadow-xl shadow-indigo-500/20 hover:shadow-indigo-500/40 transition-all hover:scale-105"
+                    >
                         <span className="lg:hidden">+</span>
-                        <span className="hidden lg:block">New Post</span>
+                        <span className="hidden lg:block">New Hint</span>
                     </Button>
                 </div>
             </div>

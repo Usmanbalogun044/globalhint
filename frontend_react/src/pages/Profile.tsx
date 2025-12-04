@@ -6,30 +6,30 @@ import { MapPin, Link as LinkIcon, Calendar } from 'lucide-react';
 import { PostItem } from '@/components/feed/PostItem';
 import { userService } from '@/services/userService';
 import { postService } from '@/services/postService';
+import { useUIStore } from '@/store/useUIStore';
 import type { Post, User } from '@/types';
 
 export const Profile: React.FC = () => {
-    const { id } = useParams<{ id: string }>();
+    const { username } = useParams<{ username: string }>();
     const { user: currentUser } = useAuthStore();
+    const { openChat } = useUIStore();
     const [activeTab, setActiveTab] = useState('posts');
     const [profileUser, setProfileUser] = useState<User | null>(null);
     const [posts, setPosts] = useState<Post[]>([]);
     const [loading, setLoading] = useState(true);
     const [isFollowing, setIsFollowing] = useState(false);
 
-    const isOwnProfile = currentUser?.id === Number(id);
+    const isOwnProfile = currentUser?.username === username;
 
     useEffect(() => {
         const fetchData = async () => {
-            if (!id) return;
+            if (!username) return;
             setLoading(true);
             try {
-                const userId = Number(id);
-                const [userData, userPosts] = await Promise.all([
-                    userService.getUser(userId),
-                    postService.getUserPosts(userId)
-                ]);
+                const userData = await userService.getUser(username);
                 setProfileUser(userData);
+                
+                const userPosts = await postService.getUserPosts(userData.id);
                 setPosts(userPosts);
                 // Check if following (mock logic for now, or add is_following to User type)
                 // setIsFollowing(userData.is_following); 
@@ -41,7 +41,7 @@ export const Profile: React.FC = () => {
         };
 
         fetchData();
-    }, [id]);
+    }, [username]);
 
     const handleFollowToggle = async () => {
         if (!profileUser) return;
@@ -50,7 +50,7 @@ export const Profile: React.FC = () => {
                 await userService.unfollowUser(profileUser.id);
                 setIsFollowing(false);
             } else {
-                await userService.followUser(profileUser.id);
+                await userService.followUser(profileUser.id, 'shadow');
                 setIsFollowing(true);
             }
         } catch (error) {
@@ -70,7 +70,7 @@ export const Profile: React.FC = () => {
                 </Button>
                 <div>
                     <h1 className="text-xl font-bold text-white leading-tight">{profileUser.name}</h1>
-                    <p className="text-xs text-gray-500">{posts.length} posts</p>
+                    <p className="text-xs text-gray-500">{posts.length} hints</p>
                 </div>
             </div>
 
@@ -98,18 +98,27 @@ export const Profile: React.FC = () => {
                     </div>
 
                     {/* Action Button */}
-                    <div className="mt-4">
+                    <div className="mt-4 flex space-x-2">
                         {isOwnProfile ? (
                             <Button variant="outline" className="rounded-full font-bold border-white/20 text-white hover:bg-white/10">
                                 Edit Profile
                             </Button>
                         ) : (
-                            <Button
-                                onClick={handleFollowToggle}
-                                className={`rounded-full font-bold ${isFollowing ? 'bg-transparent border border-white/20 text-white hover:border-red-500 hover:text-red-500 hover:bg-red-500/10' : 'bg-white text-black hover:bg-gray-200'}`}
-                            >
-                                {isFollowing ? 'Unfollow' : 'Follow'}
-                            </Button>
+                            <>
+                                <Button
+                                    onClick={() => openChat(profileUser)}
+                                    variant="outline"
+                                    className="rounded-full font-bold border-white/20 text-white hover:bg-white/10"
+                                >
+                                    Message
+                                </Button>
+                                <Button
+                                    onClick={handleFollowToggle}
+                                    className={`rounded-full font-bold ${isFollowing ? 'bg-transparent border border-white/20 text-white hover:border-red-500 hover:text-red-500 hover:bg-red-500/10' : 'bg-white text-black hover:bg-gray-200'}`}
+                                >
+                                    {isFollowing ? 'Unshadow' : 'Shadow'}
+                                </Button>
+                            </>
                         )}
                     </div>
                 </div>
@@ -155,7 +164,7 @@ export const Profile: React.FC = () => {
 
                 {/* Tabs */}
                 <div className="flex border-b border-white/10">
-                    {['Posts', 'Replies', 'Highlights', 'Media', 'Likes'].map((tab) => (
+                    {['Hints', 'Replies', 'Highlights', 'Media', 'Likes'].map((tab) => (
                         <button
                             key={tab}
                             onClick={() => setActiveTab(tab.toLowerCase())}

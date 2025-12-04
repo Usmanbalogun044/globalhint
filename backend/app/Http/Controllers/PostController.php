@@ -7,24 +7,17 @@ use Illuminate\Http\Request;
 
 class PostController extends Controller
 {
+    protected $postService;
+
+    public function __construct(\App\Services\PostService $postService)
+    {
+        $this->postService = $postService;
+    }
+
     public function index(Request $request)
     {
-        $query = Post::with(['user', 'category'])
-            ->withCount('votes')
-            ->latest();
-
-        if ($request->has('user_id')) {
-            $query->where('user_id', $request->user_id);
-        }
-
-        if ($request->has('country')) {
-            $query->whereHas('user', function ($q) use ($request) {
-                $q->where('country', $request->country);
-            });
-        }
-
-        $posts = $query->paginate(20);
-            
+        $filters = $request->only(['user_id', 'country', 'category']);
+        $posts = $this->postService->getPosts($filters);
         return response()->json($posts);
     }
 
@@ -32,35 +25,29 @@ class PostController extends Controller
     {
         $request->validate([
             'content' => 'nullable|string',
-            'category_id' => 'nullable|exists:categories,id',
-            'type' => 'required|in:text,image,video,live',
-            'media' => 'nullable|file|max:10240', // Max 10MB
+            'type' => 'required|in:text,image,video,audio,music,live',
+            'media' => 'nullable|file|max:51200', // Increased to 50MB for video
+            'category' => 'nullable|string',
         ]);
 
-        $data = $request->all();
-
-        if ($request->hasFile('media')) {
-            $path = $request->file('media')->store('uploads', 'public');
-            $data['media_url'] = asset('storage/' . $path);
+        try {
+            $post = $this->postService->createPost($request->user(), $request->all());
+            return response()->json($post->load('user'), 201);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Post creation failed: ' . $e->getMessage());
+            return response()->json(['message' => 'Failed to create hint: ' . $e->getMessage()], 500);
         }
-
-        $post = $request->user()->posts()->create($data);
-
-        return response()->json($post->load('user', 'category'), 201);
     }
 
     public function vote(Request $request, Post $post)
     {
         $request->validate([
-            'is_upvote' => 'required|boolean',
+            'type' => 'required|in:up,down',
         ]);
 
-        $vote = $post->votes()->updateOrCreate(
-            ['user_id' => $request->user()->id],
-            ['is_upvote' => $request->is_upvote]
-        );
+        $result = $this->postService->votePost($request->user(), $post, $request->type);
 
-        return response()->json($vote);
+        return response()->json($result);
     }
 
     public function getTrendingCountries()

@@ -6,6 +6,8 @@ use Illuminate\Database\Seeder;
 use App\Models\User;
 use App\Models\Category;
 use App\Models\Post;
+use App\Models\Comment;
+use App\Models\Message;
 use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
@@ -18,51 +20,53 @@ class DatabaseSeeder extends Seeder
             Category::create(['name' => $cat, 'slug' => strtolower($cat)]);
         }
 
-        // Create Users
-        $users = [
-            [
-                'name' => 'Alice Wonderland',
-                'username' => 'alice',
-                'email' => 'alice@example.com',
-                'password' => Hash::make('password'),
-                'bio' => 'Digital explorer and coffee enthusiast.',
-                'avatar' => 'https://api.dicebear.com/7.x/avataaars/svg?seed=alice'
-            ],
-            [
-                'name' => 'Bob Builder',
-                'username' => 'bob_builds',
-                'email' => 'bob@example.com',
-                'password' => Hash::make('password'),
-                'bio' => 'Building the future, one brick at a time.',
-                'avatar' => 'https://api.dicebear.com/7.x/avataaars/svg?seed=bob'
-            ],
-            [
-                'name' => 'Charlie Chef',
-                'username' => 'chef_charlie',
-                'email' => 'charlie@example.com',
-                'password' => Hash::make('password'),
-                'bio' => 'Culinary artist. Food is love.',
-                'avatar' => 'https://api.dicebear.com/7.x/avataaars/svg?seed=charlie'
-            ],
-        ];
+        // Create a test user
+        $testUser = User::factory()->create([
+            'name' => 'Test User',
+            'email' => 'test@example.com',
+            'password' => Hash::make('password'),
+            'username' => 'testuser',
+        ]);
 
-        foreach ($users as $userData) {
-            User::create($userData);
-        }
+        // Create 10 other users
+        $users = User::factory(10)->create();
 
-        // Create Posts
-        $allUsers = User::all();
-        $allCategories = Category::all();
+        // Create posts for each user
+        $users->each(function ($user) {
+            Post::factory(5)->create([
+                'user_id' => $user->id,
+            ]);
+        });
+        
+        // Create posts for test user
+        Post::factory(5)->create([
+            'user_id' => $testUser->id,
+        ]);
 
-        foreach ($allUsers as $user) {
-            for ($i = 0; $i < 3; $i++) {
-                Post::create([
-                    'user_id' => $user->id,
-                    'category_id' => $allCategories->random()->id,
-                    'content' => "Just sharing some thoughts on " . $allCategories->random()->name . ". #Globalhint",
-                    'type' => 'text'
+        // Create comments
+        Post::all()->each(function ($post) use ($users, $testUser) {
+            $commenters = $users->merge([$testUser])->random(3);
+            foreach ($commenters as $commenter) {
+                Comment::factory()->create([
+                    'post_id' => $post->id,
+                    'user_id' => $commenter->id,
                 ]);
             }
-        }
+        });
+
+        // Create messages between test user and others
+        $users->each(function ($user) use ($testUser) {
+            // Incoming messages
+            Message::factory(3)->create([
+                'sender_id' => $user->id,
+                'receiver_id' => $testUser->id,
+            ]);
+
+            // Outgoing messages
+            Message::factory(2)->create([
+                'sender_id' => $testUser->id,
+                'receiver_id' => $user->id,
+            ]);
+        });
     }
 }

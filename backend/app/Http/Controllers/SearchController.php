@@ -22,6 +22,7 @@ class SearchController extends Controller
             ->get();
 
         $posts = Post::with('user')
+            ->withCount(['votes', 'comments'])
             ->where('content', 'like', "%{$query}%")
             ->latest()
             ->limit(20)

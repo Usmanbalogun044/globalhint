@@ -4,6 +4,7 @@ import api from '@/lib/axios';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { X } from 'lucide-react';
+import { countries } from '@/lib/countries';
 
 interface RegisterModalProps {
     isOpen: boolean;
@@ -114,13 +115,25 @@ export const RegisterModal: React.FC<RegisterModalProps> = ({ isOpen, onClose, o
                             required
                             className="h-12 bg-white/5 border-white/10 text-white"
                         />
-                        <Input
-                            name="country"
-                            placeholder="Country"
-                            value={formData.country}
-                            onChange={handleChange}
-                            className="h-12 bg-white/5 border-white/10 text-white"
-                        />
+                        <div className="relative">
+                            <select
+                                name="country"
+                                value={formData.country}
+                                onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+                                className="h-12 w-full bg-white/5 border border-white/10 rounded-md text-white px-3 appearance-none focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                required
+                            >
+                                <option value="" disabled className="bg-gray-900">Select Country</option>
+                                {countries.map((country) => (
+                                    <option key={country} value={country} className="bg-gray-900 text-white">
+                                        {country}
+                                    </option>
+                                ))}
+                            </select>
+                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-white">
+                                <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                            </div>
+                        </div>
 
                         <Button type="submit" className="w-full h-12 text-lg font-semibold mt-4" disabled={loading}>
                             {loading ? 'Creating Account...' : 'Sign Up'}
