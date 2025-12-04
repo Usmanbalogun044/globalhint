@@ -5,10 +5,10 @@ FROM php:8.2-cli
 
 # Install system dependencies and PHP extensions commonly needed by Laravel
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-       git unzip libzip-dev libpq-dev libicu-dev libonig-dev \
-    && docker-php-ext-install \
-       pdo pdo_mysql \
+     && apt-get install -y --no-install-recommends \
+         git unzip libzip-dev libpq-dev libicu-dev libonig-dev \
+     && docker-php-ext-install \
+         pdo pdo_mysql pdo_pgsql \
     && docker-php-ext-configure intl \
     && docker-php-ext-install intl zip \
     && rm -rf /var/lib/apt/lists/*
