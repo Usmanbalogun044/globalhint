@@ -17,16 +17,21 @@ class DatabaseSeeder extends Seeder
         // Create Categories
         $categories = ['Technology', 'Lifestyle', 'Gaming', 'Art', 'Music'];
         foreach ($categories as $cat) {
-            Category::create(['name' => $cat, 'slug' => strtolower($cat)]);
+            Category::firstOrCreate(
+                ['slug' => strtolower($cat)],
+                ['name' => $cat]
+            );
         }
 
         // Create a test user
-        $testUser = User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-            'password' => Hash::make('password'),
-            'username' => 'testuser',
-        ]);
+        $testUser = User::firstOrCreate(
+            ['email' => 'test@example.com'],
+            [
+                'name' => 'Test User',
+                'password' => Hash::make('password'),
+                'username' => 'testuser',
+            ]
+        );
 
         // Create 10 other users
         $users = User::factory(10)->create();
