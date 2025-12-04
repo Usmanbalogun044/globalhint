@@ -29,8 +29,9 @@ RUN composer install --no-interaction --prefer-dist --no-progress $( [ "$COMPOSE
 # Copy the rest of the application code
 COPY . .
 
-# Ensure storage and bootstrap cache directories are writable
-RUN chown -R www-data:www-data storage bootstrap/cache \
+# Ensure storage and bootstrap cache directories exist and are writable
+RUN mkdir -p storage bootstrap/cache \
+    && chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
 
 # Expose application port
