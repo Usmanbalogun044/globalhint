@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useAuthStore } from '@/store/useAuthStore';
+// import { useAuthStore } from '@/store/useAuthStore';
 import { messageService } from '@/services/messageService';
 import type { User } from '@/types';
 import { Chat } from '@/components/chat/Chat';
