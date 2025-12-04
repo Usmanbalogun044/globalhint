@@ -8,7 +8,8 @@ RUN apt-get update \
      && apt-get install -y --no-install-recommends \
          git unzip libzip-dev libpq-dev libicu-dev libonig-dev \
      && docker-php-ext-install \
-         pdo pdo_mysql pdo_pgsql \
+         pdo pdo_mysql pgsql pdo_pgsql \
+     && docker-php-ext-enable pgsql pdo_pgsql \
     && docker-php-ext-configure intl \
     && docker-php-ext-install intl zip \
     && rm -rf /var/lib/apt/lists/*
@@ -24,7 +25,8 @@ COPY composer.json composer.lock* ./
 
 # Install PHP dependencies (no dev by default, can be toggled by build arg)
 ARG COMPOSER_NO_DEV=1
-RUN composer install --no-interaction --prefer-dist --no-progress $( [ "$COMPOSER_NO_DEV" = "1" ] && echo "--no-dev" )
+ARG COMPOSER_ARGS=""
+RUN composer install --no-interaction --prefer-dist --no-progress $( [ "$COMPOSER_NO_DEV" = "1" ] && echo "--no-dev" ) $COMPOSER_ARGS
 
 # Copy the rest of the application code
 COPY . .
