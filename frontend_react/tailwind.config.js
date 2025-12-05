@@ -40,6 +40,20 @@ export default {
                     DEFAULT: "hsl(var(--card))",
                     foreground: "hsl(var(--card-foreground))",
                 },
+                gold: {
+                    50: '#FBF7E6',
+                    100: '#F6EFCC',
+                    200: '#EDDF99',
+                    300: '#E4CF66',
+                    400: '#DBBF33',
+                    500: '#D4AF37', // Classic Gold
+                    600: '#AA8C2C',
+                    700: '#806921',
+                    800: '#554616',
+                    900: '#2B230B',
+                },
+                'premium-black': '#050505',
+                'premium-gray': '#121212',
             },
             borderRadius: {
                 lg: "var(--radius)",

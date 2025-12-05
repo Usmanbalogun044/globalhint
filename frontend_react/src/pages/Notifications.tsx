@@ -71,7 +71,7 @@ export const NotificationList: React.FC = () => {
                 <h2 className="text-xl font-bold">Notifications</h2>
                 <button 
                     onClick={() => markAllAsRead()}
-                    className="text-sm text-indigo-400 hover:text-indigo-300"
+                    className="text-sm text-[#DBBF33] hover:text-[#E4CF66]"
                 >
                     Mark all as read
                 </button>
@@ -79,7 +79,7 @@ export const NotificationList: React.FC = () => {
 
             {isLoading ? (
                 <div className="flex flex-col items-center justify-center py-20 text-gray-400">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500 mb-4"></div>
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#D4AF37] mb-4"></div>
                     <p>Loading updates...</p>
                 </div>
             ) : notifications.length === 0 ? (
@@ -104,7 +104,7 @@ export const NotificationList: React.FC = () => {
                                 className={`group p-4 rounded-2xl flex items-center space-x-4 transition-all duration-200 border border-white/5 cursor-pointer ${
                                     n.read_at 
                                         ? 'bg-white/5 hover:bg-white/10' 
-                                        : 'bg-indigo-500/10 border-indigo-500/30 hover:bg-indigo-500/20'
+                                        : 'bg-[#D4AF37]/10 border-[#D4AF37]/30 hover:bg-[#D4AF37]/20'
                                 }`}
                             >
                                 {/* Avatar */}
@@ -113,7 +113,7 @@ export const NotificationList: React.FC = () => {
                                         {sender_avatar ? (
                                             <img src={sender_avatar} alt={sender_name} className="w-full h-full object-cover" />
                                         ) : (
-                                            <div className="w-full h-full bg-gradient-to-br from-purple-500 to-indigo-500 flex items-center justify-center text-white font-bold text-lg">
+                                            <div className="w-full h-full bg-gradient-to-br from-[#D4AF37] to-[#AA8C2C] flex items-center justify-center text-black font-bold text-lg">
                                                 {sender_name ? sender_name[0].toUpperCase() : '?'}
                                             </div>
                                         )}
@@ -139,7 +139,7 @@ export const NotificationList: React.FC = () => {
 
                                 {/* Unread Indicator */}
                                 {!n.read_at && (
-                                    <div className="w-2.5 h-2.5 rounded-full bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]"></div>
+                                    <div className="w-2.5 h-2.5 rounded-full bg-[#D4AF37] shadow-[0_0_10px_rgba(212,175,55,0.5)]"></div>
                                 )}
                             </div>
                         );

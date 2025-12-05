@@ -31,7 +31,7 @@ const CommentItem: React.FC<{ comment: Comment; postId: number; onReply: (commen
         <div className="py-3">
             <div className="flex space-x-3">
                 <div className="flex-shrink-0">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-sm font-bold overflow-hidden">
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#D4AF37] to-[#806921] flex items-center justify-center text-black text-sm font-bold overflow-hidden">
                         {comment.user.avatar ? (
                             <img src={comment.user.avatar} alt={comment.user.name} className="w-full h-full object-cover" />
                         ) : (
@@ -52,7 +52,7 @@ const CommentItem: React.FC<{ comment: Comment; postId: number; onReply: (commen
                     <div className="flex items-center space-x-4 mt-2">
                         <button
                             onClick={() => onReply(comment.id)}
-                            className="text-gray-500 hover:text-indigo-400 text-xs flex items-center space-x-1"
+                            className="text-gray-500 hover:text-[#DBBF33] text-xs flex items-center space-x-1"
                         >
                             <MessageCircle size={14} />
                             <span>Reply</span>
@@ -69,7 +69,7 @@ const CommentItem: React.FC<{ comment: Comment; postId: number; onReply: (commen
                         {comment.replies && comment.replies.length > 0 && (
                             <button
                                 onClick={() => setShowReplies(!showReplies)}
-                                className="text-indigo-400 text-xs"
+                                className="text-[#DBBF33] text-xs"
                             >
                                 {showReplies ? 'Hide' : 'Show'} {comment.replies.length} {comment.replies.length === 1 ? 'reply' : 'replies'}
                             </button>
@@ -150,6 +150,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({ postId, isOpen, 
                         if (c.id === replyingTo) {
                             return {
                                 ...c,
+                                ...c,
                                 replies: [...(c.replies || []), comment],
                             };
                         }
@@ -187,7 +188,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({ postId, isOpen, 
                 {isAuthenticated && (
                     <form onSubmit={handleSubmit} className="mb-4">
                         {replyingTo && (
-                            <div className="mb-2 text-xs text-indigo-400 flex items-center justify-between">
+                            <div className="mb-2 text-xs text-[#DBBF33] flex items-center justify-between">
                                 <span>Replying to comment...</span>
                                 <button type="button" onClick={() => setReplyingTo(null)} className="text-gray-500 hover:text-white">
                                     Cancel
@@ -196,7 +197,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({ postId, isOpen, 
                         )}
                         <div className="flex space-x-2">
                             <div className="flex-shrink-0">
-                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-sm font-bold overflow-hidden">
+                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#D4AF37] to-[#806921] flex items-center justify-center text-black text-sm font-bold overflow-hidden">
                                     {user?.avatar ? (
                                         <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
                                     ) : (
@@ -209,7 +210,7 @@ export const CommentSection: React.FC<CommentSectionProps> = ({ postId, isOpen, 
                                     value={newComment}
                                     onChange={(e) => setNewComment(e.target.value)}
                                     placeholder="Write a comment..."
-                                    className="w-full bg-white/5 border border-white/10 rounded-lg p-2 text-white text-sm resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                    className="w-full bg-white/5 border border-white/10 rounded-lg p-2 text-white text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#D4AF37]"
                                     rows={2}
                                 />
                                 <div className="flex justify-end mt-2">

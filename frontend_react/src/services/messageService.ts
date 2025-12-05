@@ -44,5 +44,14 @@ export const messageService = {
 
     async markAsRead(messageId: number): Promise<void> {
         await api.post(`/messages/${messageId}/read`);
+    },
+
+    async getUnreadCount(): Promise<number> {
+        const response = await api.get('/messages/unread-count');
+        return response.data.count;
+    },
+
+    async markConversationAsRead(senderId: number): Promise<void> {
+        await api.post(`/messages/${senderId}/read-conversation`);
     }
 };

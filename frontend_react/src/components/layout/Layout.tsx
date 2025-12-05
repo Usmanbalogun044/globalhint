@@ -1,9 +1,11 @@
 import React from 'react';
+import { useLocation } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { BottomNav } from './BottomNav';
 import { RightPanel } from './RightPanel';
 import { LoginModal } from '@/components/auth/LoginModal';
 import { RegisterModal } from '@/components/auth/RegisterModal';
+import { ForgotPasswordModal } from '@/components/auth/ForgotPasswordModal';
 import { useUIStore } from '@/store/useUIStore';
 
 import { VideoCallModal } from '@/components/chat/VideoCallModal';
@@ -24,7 +26,8 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     const {
         isLoginOpen, closeLogin, openLogin,
         isRegisterOpen, closeRegister, openRegister,
-        switchToRegister, switchToLogin,
+        isForgotPasswordOpen, closeForgotPassword,
+        switchToRegister, switchToLogin, switchToForgotPassword,
         activeChatUser, closeChat,
         incomingCall, setIncomingCall, activeCall, setActiveCall
     } = useUIStore();
@@ -110,16 +113,19 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         return () => window.removeEventListener('show-toast', handleShowToast as EventListener);
     }, []);
 
+    const location = useLocation();
+    const isFullScreenPage = ['/explore', '/messages', '/notifications', '/discover'].some(path => location.pathname.startsWith(path));
+
     return (
         <div className="min-h-screen bg-background text-foreground font-sans selection:bg-indigo-500/30">
             <div className="flex justify-center max-w-[1920px] mx-auto">
                 <Sidebar onOpenLogin={openLogin} onOpenRegister={openRegister} />
 
-                <main className="flex-1 min-h-screen border-r border-white/10 max-w-2xl w-full pb-20 md:pb-0">
+                <main className={`flex-1 min-h-screen ${!isFullScreenPage ? 'border-r border-white/10 max-w-2xl' : 'max-w-full'} w-full pb-20 md:pb-0`}>
                     {children}
                 </main>
 
-                <RightPanel />
+                {!isFullScreenPage && <RightPanel />}
             </div>
 
             <BottomNav onOpenLogin={openLogin} />
@@ -128,10 +134,16 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 isOpen={isLoginOpen}
                 onClose={closeLogin}
                 onSwitchToRegister={switchToRegister}
+                onSwitchToForgotPassword={switchToForgotPassword}
             />
             <RegisterModal
                 isOpen={isRegisterOpen}
                 onClose={closeRegister}
+                onSwitchToLogin={switchToLogin}
+            />
+            <ForgotPasswordModal
+                isOpen={isForgotPasswordOpen}
+                onClose={closeForgotPassword}
                 onSwitchToLogin={switchToLogin}
             />
 

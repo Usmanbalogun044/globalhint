@@ -5,6 +5,8 @@ import { Profile } from '@/pages/Profile';
 import { LiveStream } from '@/pages/LiveStream';
 import { Messages } from '@/pages/Messages';
 import { NotificationList } from '@/pages/Notifications';
+import Explore from '@/pages/Explore';
+import Discover from '@/pages/Discover';
 
 function App() {
   return (
@@ -16,6 +18,10 @@ function App() {
           <Route path="/live" element={<LiveStream />} />
           <Route path="/messages" element={<Messages />} />
           <Route path="/notifications" element={<NotificationList />} />
+          <Route path="/notifications" element={<NotificationList />} />
+          <Route path="/explore" element={<Explore />} />
+          <Route path="/discover" element={<Discover />} />
+          <Route path="/profile/:username" element={<Profile />} />
         </Routes>
       </Layout>
     </Router>

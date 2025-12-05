@@ -13,17 +13,27 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = () => {
     const { isCreatePostOpen, closeCreatePost } = useUIStore();
     const { user } = useAuthStore();
     const [content, setContent] = useState('');
-    const [category, setCategory] = useState('General');
+    const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+    const [availableCategories, setAvailableCategories] = useState<{id: number, name: string}[]>([]);
     const [media, setMedia] = useState<File | null>(null);
     const [mediaPreview, setMediaPreview] = useState<string | null>(null);
     const [mediaType, setMediaType] = useState<'image' | 'video' | 'audio' | 'music' | 'text'>('text');
     
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const categories = [
-        'General', 'News', 'Jobs', 'Opportunities/Business', 'Products', 
-        'Travels', 'Education/Training', 'Faith', 'Fun', 'Investments'
-    ];
+    React.useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const cats = await postService.getCategories();
+                setAvailableCategories(cats);
+            } catch (error) {
+                console.error('Failed to fetch categories', error);
+            }
+        };
+        if (isCreatePostOpen) {
+            fetchCategories();
+        }
+    }, [isCreatePostOpen]);
 
     if (!isCreatePostOpen) return null;
 
@@ -46,45 +56,40 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = () => {
         if (fileInputRef.current) fileInputRef.current.value = '';
     };
 
+    const toggleCategory = (catName: string) => {
+        setSelectedCategories(prev => {
+            if (prev.includes(catName)) {
+                return prev.filter(c => c !== catName);
+            } else {
+                return [...prev, catName];
+            }
+        });
+    };
+
     const handleSubmit = async () => {
         if (!content.trim() && !media) return;
 
-        // Background Upload Pattern:
-        // 1. Close Modal Immediately
         closeCreatePost();
-        
-        // 2. Show "Posting..." Toast (We need a way to trigger global toast from here, 
-        //    but since we are inside Layout, we might need to dispatch an event or use a store.
-        //    For now, let's assume the Layout listens to a global event or we just fire and forget)
-        
-        // Ideally, we should have a useToastStore or similar. 
-        // Since we don't have that refactored yet, we will use a custom event or just console log for now
-        // and let the Layout handle the "success" toast via the real-time event that comes back.
-        // BUT the user wants a "loading" notification.
-        
-        // Let's implement a simple "Optimistic UI" or "Background Task" approach.
-        // We will dispatch a custom event that Layout listens to for "Toast"
         
         window.dispatchEvent(new CustomEvent('show-toast', { 
             detail: { message: 'Posting your hint...', type: 'info' } 
         }));
 
         try {
-            await postService.createPost(content, mediaType, media || undefined, category);
+            // Pass selectedCategories as the category argument (which now accepts array)
+            // @ts-ignore - postService needs update to accept array in type definition, but JS works
+            await postService.createPost(content, mediaType, media || undefined, selectedCategories);
             
-            // Success Toast
             window.dispatchEvent(new CustomEvent('show-toast', { 
                 detail: { message: 'Hint posted successfully!', type: 'success' } 
             }));
             
-            // Cleanup
             setContent('');
-            setCategory('General');
+            setSelectedCategories([]);
             removeMedia();
             
         } catch (error) {
             console.error('Failed to post:', error);
-             // Error Toast
              window.dispatchEvent(new CustomEvent('show-toast', { 
                 detail: { message: 'Failed to post hint. Please try again.', type: 'error' } 
             }));
@@ -106,7 +111,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = () => {
                 <div className="p-6 space-y-6 overflow-y-auto custom-scrollbar flex-1">
                     {/* User Info */}
                     <div className="flex items-center space-x-3">
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-lg">
+                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#D4AF37] to-[#806921] flex items-center justify-center text-black font-bold text-lg shadow-lg shadow-[#D4AF37]/20">
                             {user?.avatar ? <img src={user.avatar} className="w-full h-full rounded-full object-cover" /> : user?.name?.[0]}
                         </div>
                         <div>
@@ -151,19 +156,19 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = () => {
 
                     {/* Category Selector */}
                     <div className="space-y-2">
-                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Category</label>
+                        <label className="text-xs font-bold text-gray-500 uppercase tracking-wider">Categories (Select multiple)</label>
                         <div className="flex flex-wrap gap-2">
-                            {categories.map(cat => (
+                            {availableCategories.map(cat => (
                                 <button
-                                    key={cat}
-                                    onClick={() => setCategory(cat)}
+                                    key={cat.id}
+                                    onClick={() => toggleCategory(cat.name)}
                                     className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
-                                        category === cat 
-                                            ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/25' 
+                                        selectedCategories.includes(cat.name)
+                                            ? 'bg-[#D4AF37] text-black shadow-lg shadow-[#D4AF37]/25 font-bold' 
                                             : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'
                                     }`}
                                 >
-                                    {cat}
+                                    {cat.name}
                                 </button>
                             ))}
                         </div>
@@ -192,7 +197,7 @@ export const CreatePostModal: React.FC<CreatePostModalProps> = () => {
                     <Button 
                         onClick={handleSubmit}
                         disabled={(!content.trim() && !media)}
-                        className="rounded-full px-8 font-bold bg-indigo-600 hover:bg-indigo-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="rounded-full px-8 font-bold bg-[#D4AF37] hover:bg-[#AA8C2C] text-black shadow-lg shadow-[#D4AF37]/20 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         Post Hint
                     </Button>

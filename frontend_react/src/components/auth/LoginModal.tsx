@@ -1,22 +1,26 @@
 import React, { useState } from 'react';
 import { useAuthStore } from '@/store/useAuthStore';
+import { useUIStore } from '@/store/useUIStore';
 import api from '@/lib/axios';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { X } from 'lucide-react';
+import { X, Eye, EyeOff, Mail, Lock } from 'lucide-react';
 
 interface LoginModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSwitchToRegister: () => void;
+    onSwitchToForgotPassword: () => void;
 }
 
-export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSwitchToRegister }) => {
+export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSwitchToRegister, onSwitchToForgotPassword }) => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const login = useAuthStore((state) => state.login);
+    const { setVerificationEmail } = useUIStore();
 
     if (!isOpen) return null;
 
@@ -29,8 +33,13 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSwitc
             const response = await api.post('/login', { email, password });
             login(response.data.user, response.data.access_token);
             onClose();
-            window.location.reload(); // Refresh to update state fully if needed
+            window.location.reload(); 
         } catch (err: any) {
+            if (err.response?.status === 403 && err.response?.data?.requires_verification) {
+                setVerificationEmail(err.response.data.email);
+                onSwitchToRegister(); // This will now open RegisterModal at Step 2
+                return;
+            }
             setError(err.response?.data?.message || 'Login failed');
         } finally {
             setLoading(false);
@@ -40,8 +49,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSwitc
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
             <div className="relative w-full max-w-md overflow-hidden rounded-2xl bg-[#0f0f12] border border-white/10 shadow-2xl animate-in fade-in zoom-in duration-200">
-                {/* Close Button */}
-                <button onClick={onClose} className="absolute right-4 top-4 text-gray-400 hover:text-white transition">
+                <button onClick={onClose} className="absolute right-4 top-4 text-gray-400 hover:text-white transition z-10">
                     <X size={24} />
                 </button>
 
@@ -58,28 +66,48 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSwitc
                     )}
 
                     <form onSubmit={handleSubmit} className="space-y-4">
-                        <div>
+                        <div className="relative">
+                            <Mail className="absolute left-3 top-3.5 text-gray-500" size={20} />
                             <Input
                                 type="email"
                                 placeholder="Email address"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
-                                className="h-12 bg-white/5 border-white/10 text-white placeholder-gray-500 focus:border-indigo-500 focus:ring-indigo-500"
+                                className="h-12 pl-10 bg-white/5 border-white/10 text-white placeholder-gray-500 focus:border-[#D4AF37] focus:ring-[#D4AF37]"
                             />
                         </div>
                         <div>
-                            <Input
-                                type="password"
-                                placeholder="Password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                                className="h-12 bg-white/5 border-white/10 text-white placeholder-gray-500 focus:border-indigo-500 focus:ring-indigo-500"
-                            />
+                            <div className="relative">
+                                <Lock className="absolute left-3 top-3.5 text-gray-500" size={20} />
+                                <Input
+                                    type={showPassword ? "text" : "password"}
+                                    placeholder="Password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    required
+                                    className="h-12 pl-10 pr-10 bg-white/5 border-white/10 text-white placeholder-gray-500 focus:border-[#D4AF37] focus:ring-[#D4AF37]"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-3 top-3.5 text-gray-500 hover:text-white"
+                                >
+                                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                </button>
+                            </div>
+                            <div className="flex justify-end mt-2">
+                                <button 
+                                    type="button"
+                                    onClick={onSwitchToForgotPassword}
+                                    className="text-sm text-gray-400 hover:text-[#DBBF33] transition"
+                                >
+                                    Forgot Password?
+                                </button>
+                            </div>
                         </div>
 
-                        <Button type="submit" className="w-full h-12 text-lg font-semibold mt-4" disabled={loading}>
+                        <Button type="submit" className="w-full h-12 text-lg font-bold mt-4 bg-[#D4AF37] hover:bg-[#AA8C2C] text-black" disabled={loading}>
                             {loading ? 'Signing in...' : 'Sign In'}
                         </Button>
                     </form>
@@ -87,7 +115,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onSwitc
                     <div className="mt-6 text-center">
                         <p className="text-gray-400">
                             Don't have an account?{' '}
-                            <button onClick={onSwitchToRegister} className="text-indigo-400 hover:text-indigo-300 font-medium transition">
+                            <button onClick={onSwitchToRegister} className="text-[#DBBF33] hover:text-[#E4CF66] font-medium transition">
                                 Sign up
                             </button>
                         </p>

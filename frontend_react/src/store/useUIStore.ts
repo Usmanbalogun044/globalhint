@@ -11,6 +11,14 @@ interface UIState {
     switchToRegister: () => void;
     switchToLogin: () => void;
     
+    isForgotPasswordOpen: boolean;
+    openForgotPassword: () => void;
+    closeForgotPassword: () => void;
+    switchToForgotPassword: () => void;
+
+    verificationEmail: string;
+    setVerificationEmail: (email: string) => void;
+
     activeChatUser: User | null;
     openChat: (user: User) => void;
     closeChat: () => void;
@@ -29,15 +37,23 @@ interface UIState {
 export const useUIStore = create<UIState>((set) => ({
     isLoginOpen: false,
     isRegisterOpen: false,
+    isForgotPasswordOpen: false,
+    verificationEmail: '',
 
-    openLogin: () => set({ isLoginOpen: true, isRegisterOpen: false }),
+    openLogin: () => set({ isLoginOpen: true, isRegisterOpen: false, isForgotPasswordOpen: false }),
     closeLogin: () => set({ isLoginOpen: false }),
 
-    openRegister: () => set({ isRegisterOpen: true, isLoginOpen: false }),
-    closeRegister: () => set({ isRegisterOpen: false }),
+    openRegister: () => set({ isRegisterOpen: true, isLoginOpen: false, isForgotPasswordOpen: false }),
+    closeRegister: () => set({ isRegisterOpen: false, verificationEmail: '' }),
 
-    switchToRegister: () => set({ isLoginOpen: false, isRegisterOpen: true }),
-    switchToLogin: () => set({ isRegisterOpen: false, isLoginOpen: true }),
+    openForgotPassword: () => set({ isForgotPasswordOpen: true, isLoginOpen: false, isRegisterOpen: false }),
+    closeForgotPassword: () => set({ isForgotPasswordOpen: false }),
+
+    switchToRegister: () => set({ isLoginOpen: false, isRegisterOpen: true, isForgotPasswordOpen: false }),
+    switchToLogin: () => set({ isRegisterOpen: false, isLoginOpen: true, isForgotPasswordOpen: false }),
+    switchToForgotPassword: () => set({ isLoginOpen: false, isForgotPasswordOpen: true, isRegisterOpen: false }),
+
+    setVerificationEmail: (email) => set({ verificationEmail: email }),
 
     activeChatUser: null,
     openChat: (user) => set({ activeChatUser: user }),

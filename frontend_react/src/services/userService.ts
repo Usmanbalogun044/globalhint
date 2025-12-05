@@ -18,5 +18,19 @@ export const userService = {
     async getSuggestedUsers(): Promise<User[]> {
         const response = await api.get('/users/suggested');
         return response.data;
+    },
+
+    async searchUsers(query: string): Promise<User[]> {
+        const response = await api.get(`/users/search?q=${query}`);
+        return response.data;
+    },
+
+    async updateProfile(data: FormData): Promise<User> {
+        const response = await api.post('/user/profile', data, {
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+        return response.data.user;
     }
 };

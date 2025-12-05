@@ -42,7 +42,7 @@ export const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated }) => {
         if (!content.trim() && !media) return;
         setLoading(true);
         try {
-            const newPost = await postService.createPost(content, mediaType, media || undefined, category);
+            const newPost = await postService.createPost(content, mediaType, media || undefined, [category]);
             setContent('');
             setMedia(null);
             setMediaType('text');
@@ -61,7 +61,7 @@ export const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated }) => {
         <div className="border-b border-white/10 p-4">
             <div className="flex space-x-3">
                 <div className="flex-shrink-0">
-                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#D4AF37] to-[#806921] flex items-center justify-center text-black font-bold">
                         {user?.avatar ? <img src={user.avatar} className="w-full h-full rounded-full object-cover" /> : user?.name?.[0] || '?'}
                     </div>
                 </div>
@@ -75,7 +75,7 @@ export const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated }) => {
 
                     {media && (
                         <div className="mt-2 relative">
-                            <div className="text-sm text-indigo-400 bg-indigo-500/10 px-3 py-1 rounded-full inline-flex items-center">
+                            <div className="text-sm text-[#DBBF33] bg-[#D4AF37]/10 px-3 py-1 rounded-full inline-flex items-center">
                                 {mediaType === 'image' && <Image size={14} className="mr-1" />}
                                 {mediaType === 'video' && <Film size={14} className="mr-1" />}
                                 {mediaType === 'audio' && <Mic size={14} className="mr-1" />}
@@ -95,13 +95,13 @@ export const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated }) => {
 
                     <div className="flex items-center justify-between mt-2 pt-2 border-t border-white/5">
                         <div className="flex space-x-1 items-center">
-                            <Button onClick={() => triggerFileInput('image')} variant="ghost" size="icon" className="text-indigo-400 hover:bg-indigo-500/10 rounded-full w-9 h-9">
+                            <Button onClick={() => triggerFileInput('image')} variant="ghost" size="icon" className="text-[#DBBF33] hover:bg-[#D4AF37]/10 rounded-full w-9 h-9">
                                 <Image size={20} />
                             </Button>
-                            <Button onClick={() => triggerFileInput('video')} variant="ghost" size="icon" className="text-indigo-400 hover:bg-indigo-500/10 rounded-full w-9 h-9">
+                            <Button onClick={() => triggerFileInput('video')} variant="ghost" size="icon" className="text-[#DBBF33] hover:bg-[#D4AF37]/10 rounded-full w-9 h-9">
                                 <Film size={20} />
                             </Button>
-                            <Button onClick={() => triggerFileInput('audio')} variant="ghost" size="icon" className="text-indigo-400 hover:bg-indigo-500/10 rounded-full w-9 h-9">
+                            <Button onClick={() => triggerFileInput('audio')} variant="ghost" size="icon" className="text-[#DBBF33] hover:bg-[#D4AF37]/10 rounded-full w-9 h-9">
                                 <Mic size={20} />
                             </Button>
                             <Button onClick={() => window.location.href = '/live'} variant="ghost" size="icon" className="text-red-500 hover:bg-red-500/10 rounded-full w-9 h-9 animate-pulse">
@@ -112,7 +112,7 @@ export const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated }) => {
                             <select 
                                 value={category} 
                                 onChange={(e) => setCategory(e.target.value)}
-                                className="bg-black/20 text-indigo-400 text-sm rounded-full border border-white/10 px-2 py-1 ml-2 focus:outline-none focus:border-indigo-500"
+                                className="bg-black/20 text-[#DBBF33] text-sm rounded-full border border-white/10 px-2 py-1 ml-2 focus:outline-none focus:border-[#D4AF37]"
                             >
                                 {categories.map(cat => (
                                     <option key={cat} value={cat} className="bg-gray-900 text-white">{cat}</option>
@@ -122,7 +122,7 @@ export const CreatePost: React.FC<CreatePostProps> = ({ onPostCreated }) => {
                         <Button
                             onClick={handlePost}
                             disabled={(!content.trim() && !media) || loading}
-                            className="rounded-full px-5 font-bold bg-indigo-500 hover:bg-indigo-600 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="rounded-full px-5 font-bold bg-[#D4AF37] hover:bg-[#AA8C2C] text-black disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {loading ? 'Hinting...' : 'Hint'}
                         </Button>

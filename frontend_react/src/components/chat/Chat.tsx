@@ -27,6 +27,8 @@ export const Chat: React.FC<ChatProps> = ({ recipient, onClose, className }) => 
                 const data = await messageService.getMessages(recipient.id);
                 setMessages(data);
                 scrollToBottom();
+                // Mark conversation as read
+                messageService.markConversationAsRead(recipient.id).catch(console.error);
             }
         };
 

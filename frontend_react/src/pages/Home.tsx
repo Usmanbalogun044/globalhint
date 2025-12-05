@@ -16,13 +16,21 @@ export const Home: React.FC = () => {
     const [posts, setPosts] = useState<Post[]>([]);
     const [loading, setLoading] = useState(true);
     const [activeCategory, setActiveCategory] = useState('All');
-
-    const categories = [
-        'All', 'News', 'Jobs', 'Opportunities/Business', 'Products', 
-        'Travels', 'Education/Training', 'Faith', 'Fun', 'Investments'
-    ];
+    const [categories, setCategories] = useState<string[]>(['All']);
 
     const location = useLocation();
+
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const cats = await postService.getCategories();
+                setCategories(['All', ...cats.map(c => c.name)]);
+            } catch (error) {
+                console.error('Failed to fetch categories', error);
+            }
+        };
+        fetchCategories();
+    }, []);
 
     useEffect(() => {
         const fetchPosts = async () => {
@@ -32,29 +40,9 @@ export const Home: React.FC = () => {
                 const params = new URLSearchParams(location.search);
                 const country = params.get('country');
                 
-                // If category is selected (and not All), filter by it
-                // Note: postService.getPosts needs to support category filter object or argument
-                // For now, we might need to update getPosts signature or pass object
-                // Let's assume we update getPosts to take an object or we manually construct URL in service
-                // Actually, let's update postService.getPosts to accept filters object
-                
-                // Temporary fix: we will filter client side if backend doesn't support it yet, 
-                // BUT we just added backend support. We need to update postService.getPosts to pass category.
-                
-                // Let's assume we updated postService.getPosts to accept filters. 
-                // Wait, I need to update postService.getPosts signature first or pass a filter object.
-                // The current signature is getPosts(country?: string). 
-                // I should update it to getPosts(filters?: { country?: string, category?: string })
-                
-                // For this step, I will just pass country. I will update postService in next step to support category.
-                const data = await postService.getPosts(country || undefined); 
-                
-                // Client-side filtering for now until service update
-                if (activeCategory !== 'All') {
-                    setPosts(data.filter(p => p.category === activeCategory));
-                } else {
-                    setPosts(data);
-                }
+                // Fetch posts with filters
+                const data = await postService.getPosts(country || undefined, activeCategory); 
+                setPosts(data);
             } catch (error) {
                 console.error("Failed to fetch hints:", error);
             } finally {
@@ -68,7 +56,11 @@ export const Home: React.FC = () => {
         const channel = echo.channel('posts');
         channel.listen('PostCreated', (e: { post: Post }) => {
             setPosts((prevPosts) => {
-                if (activeCategory !== 'All' && e.post.category !== activeCategory) return prevPosts;
+                // If filtering by category, only add if post has that category
+                if (activeCategory !== 'All') {
+                    const postCategories = e.post.categories || [];
+                    if (!postCategories.includes(activeCategory)) return prevPosts;
+                }
                 return [e.post, ...prevPosts];
             });
         });
@@ -80,7 +72,10 @@ export const Home: React.FC = () => {
 
     const handlePostCreated = (newPost: Post) => {
         setPosts((prev) => {
-            if (activeCategory !== 'All' && newPost.category !== activeCategory) return prev;
+            if (activeCategory !== 'All') {
+                 const postCategories = newPost.categories || [];
+                 if (!postCategories.includes(activeCategory)) return prev;
+            }
             if (prev.find(p => p.id === newPost.id)) return prev;
             return [newPost, ...prev];
         });
@@ -102,7 +97,7 @@ export const Home: React.FC = () => {
                             onClick={() => setActiveCategory(cat)}
                             className={`whitespace-nowrap px-4 py-1.5 rounded-full text-sm font-bold transition-colors ${
                                 activeCategory === cat 
-                                    ? 'bg-indigo-500 text-white' 
+                                    ? 'bg-[#D4AF37] text-black shadow-lg shadow-[#D4AF37]/20' 
                                     : 'bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'
                             }`}
                         >
@@ -120,7 +115,7 @@ export const Home: React.FC = () => {
                     <h2 className="text-2xl font-bold text-white mb-2">Welcome to Globalhint</h2>
                     <p className="text-gray-400 mb-6">Join the conversation and connect with the world.</p>
                     <div className="flex justify-center space-x-4">
-                        <Button onClick={openLogin} className="rounded-full font-bold px-8 bg-indigo-500 hover:bg-indigo-600 text-white">
+                        <Button onClick={openLogin} className="rounded-full font-bold px-8 bg-[#D4AF37] hover:bg-[#AA8C2C] text-black shadow-lg shadow-[#D4AF37]/20">
                             Log in
                         </Button>
                         <Button onClick={openRegister} variant="outline" className="rounded-full font-bold px-8 border-white/20 text-white hover:bg-white/10">
