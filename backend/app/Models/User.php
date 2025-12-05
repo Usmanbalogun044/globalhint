@@ -30,6 +30,9 @@ class User extends Authenticatable
         'location',
         'website',
         'country',
+        'latitude',
+        'longitude',
+        'is_location_public',
     ];
 
     /**
@@ -47,6 +50,9 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'latitude' => 'decimal:8',
+            'longitude' => 'decimal:8',
+            'is_location_public' => 'boolean',
         ];
     }
 

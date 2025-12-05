@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\GlobalController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CommentController;
@@ -62,4 +63,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/notifications/unread-count', [App\Http\Controllers\NotificationController::class, 'unreadCount']);
     Route::post('/notifications/{id}/read', [App\Http\Controllers\NotificationController::class, 'markAsRead']);
     Route::post('/notifications/read-all', [App\Http\Controllers\NotificationController::class, 'markAllAsRead']);
+
+    // Global Real-time
+    Route::post('/global/location', [GlobalController::class, 'updateLocation']);
+    Route::get('/global/map-data', [GlobalController::class, 'getMapData']);
+    Route::get('/global/news', [GlobalController::class, 'getNews']);
+    Route::get('/global/weather', [GlobalController::class, 'getWeather']);
 });
