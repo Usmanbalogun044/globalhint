@@ -11,8 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('posts', function (Blueprint $table) {
-            //
+        Schema::create('email_verifications', function (Blueprint $table) {
+            $table->id();
+            $table->string('email')->index();
+            $table->string('otp');
+            $table->timestamp('expires_at');
+            $table->timestamps();
         });
     }
 
@@ -21,8 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('posts', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('email_verifications');
     }
 };

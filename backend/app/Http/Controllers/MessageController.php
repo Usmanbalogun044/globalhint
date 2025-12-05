@@ -53,4 +53,15 @@ class MessageController extends Controller
 
         return response()->json(['message' => 'Marked as read']);
     }
+    public function unreadCount(Request $request)
+    {
+        $count = $this->messageService->getUnreadCount($request->user());
+        return response()->json(['count' => $count]);
+    }
+
+    public function markConversationRead(Request $request, $senderId)
+    {
+        $this->messageService->markConversationAsRead($request->user(), $senderId);
+        return response()->json(['message' => 'Conversation marked as read']);
+    }
 }

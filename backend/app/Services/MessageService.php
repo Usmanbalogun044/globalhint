@@ -80,4 +80,18 @@ class MessageService
 
         return false;
     }
+    public function getUnreadCount(User $user): int
+    {
+        return Message::where('receiver_id', $user->id)
+            ->whereNull('read_at')
+            ->count();
+    }
+
+    public function markConversationAsRead(User $user, int $senderId): void
+    {
+        Message::where('receiver_id', $user->id)
+            ->where('sender_id', $senderId)
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
+    }
 }

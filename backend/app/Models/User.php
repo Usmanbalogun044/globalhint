@@ -77,8 +77,16 @@ class User extends Authenticatable
     /**
      * Override the default notifications relationship to use our custom model.
      */
+    /**
+     * Override the default notifications relationship to use our custom model.
+     */
     public function notifications()
     {
         return $this->hasMany(Notification::class);
+    }
+
+    public function profile()
+    {
+        return $this->hasOne(Profile::class);
     }
 }

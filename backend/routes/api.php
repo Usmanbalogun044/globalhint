@@ -11,12 +11,17 @@ use App\Http\Controllers\VideoCallController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/auth/send-otp', [AuthController::class, 'sendOtp']);
+Route::post('/auth/verify-otp', [AuthController::class, 'verifyOtp']);
+Route::post('/auth/reset-password', [AuthController::class, 'resetPassword']);
 
 Route::get('/posts', [PostController::class, 'index']);
 Route::get('/users/suggested', [UserController::class, 'suggested']);
+Route::get('/users/search', [UserController::class, 'search']);
 Route::get('/countries/trending', [PostController::class, 'getTrendingCountries']);
 Route::get('/search', [App\Http\Controllers\SearchController::class, 'index']);
 Route::get('/users/{user}', [UserController::class, 'show']);
+Route::get('/categories', [App\Http\Controllers\CategoryController::class, 'index']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -32,6 +37,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Users
     Route::post('/users/{user}/follow', [UserController::class, 'follow']);
     Route::post('/users/{user}/unfollow', [UserController::class, 'unfollow']);
+    Route::post('/user/profile', [UserController::class, 'updateProfile']);
 
     // Comments
     Route::get('/posts/{post}/comments', [CommentController::class, 'index']);
@@ -40,9 +46,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Messages
     Route::get('/messages/conversations', [MessageController::class, 'conversations']);
+    Route::get('/messages/unread-count', [MessageController::class, 'unreadCount']);
     Route::get('/messages/{user}', [MessageController::class, 'index']);
     Route::post('/messages/{user}', [MessageController::class, 'store']);
     Route::post('/messages/{id}/read', [MessageController::class, 'markAsRead']);
+    Route::post('/messages/{senderId}/read-conversation', [MessageController::class, 'markConversationRead']);
 
     // Video Call Signaling
     Route::post('/video-call/initiate', [VideoCallController::class, 'initiate']);

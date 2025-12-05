@@ -20,11 +20,21 @@ class PostService
         $this->notificationService = $notificationService;
     }
 
-    public function getPosts(array $filters = []): LengthAwarePaginator
+    public function getPosts(array $filters = [], ?User $currentUser = null): LengthAwarePaginator
     {
-        $query = Post::with(['user', 'votes']) // Removed 'category' as it might not exist yet based on migration check
+        $query = Post::with(['user', 'votes'])
             ->withCount(['votes', 'comments'])
             ->latest();
+
+        if ($currentUser) {
+            $query->addSelect(['posts.*'])
+                ->selectSub(function ($q) use ($currentUser) {
+                    $q->from('follows')
+                        ->selectRaw('count(*)')
+                        ->whereColumn('following_id', 'posts.user_id')
+                        ->where('follower_id', $currentUser->id);
+                }, 'is_shadowing');
+        }
 
         if (!empty($filters['user_id'])) {
             $query->where('user_id', $filters['user_id']);
@@ -37,7 +47,8 @@ class PostService
         }
 
         if (!empty($filters['category'])) {
-            $query->where('category', $filters['category']);
+            // Check if the category exists in the JSON array
+            $query->whereJsonContains('categories', $filters['category']);
         }
 
         return $query->paginate(20);
@@ -60,12 +71,22 @@ class PostService
             $mediaUrl = $this->uploadFile($data['media'], $path);
         }
 
+        // Ensure categories is an array
+        $categories = $data['categories'] ?? [];
+        if (is_string($categories)) {
+            // Handle comma-separated string if sent that way
+            $categories = array_map('trim', explode(',', $categories));
+        } elseif (!is_array($categories)) {
+             // Fallback if single value or null
+             $categories = $data['category'] ? [$data['category']] : ['General'];
+        }
+
         return Post::create([
             'user_id' => $user->id,
             'content' => $data['content'] ?? null,
             'type' => $data['type'] ?? 'text',
             'media_url' => $mediaUrl,
-            'category' => $data['category'] ?? 'General',
+            'categories' => $categories,
         ]);
     }
 

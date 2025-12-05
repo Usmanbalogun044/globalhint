@@ -32,6 +32,7 @@ class PostFactory extends Factory
             'content' => $this->faker->paragraph(),
             'type' => $type,
             'media_url' => $mediaUrl,
+            'categories' => $this->faker->randomElements(['Technology', 'Lifestyle', 'Gaming', 'Art', 'Music', 'News', 'Jobs'], rand(1, 3)),
             'created_at' => $this->faker->dateTimeBetween('-1 month', 'now'),
         ];
     }

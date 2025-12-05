@@ -11,10 +11,11 @@ return new class extends Migration
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('category_id')->nullable()->constrained()->onDelete('set null');
+            $table->json('categories')->nullable();
             $table->text('content')->nullable();
             $table->string('type')->default('text'); // text, image, video, live
             $table->string('media_url')->nullable();
+            $table->json('media_metadata')->nullable();
             $table->timestamps();
         });
     }

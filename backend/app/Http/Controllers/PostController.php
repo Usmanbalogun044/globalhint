@@ -17,7 +17,7 @@ class PostController extends Controller
     public function index(Request $request)
     {
         $filters = $request->only(['user_id', 'country', 'category']);
-        $posts = $this->postService->getPosts($filters);
+        $posts = $this->postService->getPosts($filters, $request->user('sanctum'));
         return response()->json($posts);
     }
 
@@ -26,8 +26,10 @@ class PostController extends Controller
         $request->validate([
             'content' => 'nullable|string',
             'type' => 'required|in:text,image,video,audio,music,live',
-            'media' => 'nullable|file|max:51200', // Increased to 50MB for video
-            'category' => 'nullable|string',
+            'media' => 'nullable|file|max:102400', // Max 100MB
+            'categories' => 'nullable|array',
+            'categories.*' => 'string',
+            'category' => 'nullable|string', // Backward compatibility
         ]);
 
         try {
