@@ -12,4 +12,4 @@ if [ "$RUN_SEED" = "true" ]; then
 	php artisan db:seed --force || true
 fi
 
-exec php artisan serve --host=0.0.0.0 --port="$PORT"
+exec php artisan serve --host=0.0.0.0 --port="8000"
