@@ -55,10 +55,12 @@ class PostController extends Controller
     public function getTrendingCountries()
     {
         // Get countries with the most users or posts
-        $countries = \App\Models\User::select('country')
-            ->whereNotNull('country')
+        // Get countries with the most posts (Hints)
+        $countries = Post::join('users', 'posts.user_id', '=', 'users.id')
+            ->whereNotNull('users.country')
+            ->select('users.country')
             ->selectRaw('count(*) as count')
-            ->groupBy('country')
+            ->groupBy('users.country')
             ->orderByDesc('count')
             ->limit(5)
             ->get();

@@ -107,7 +107,7 @@ export const RightPanel: React.FC = () => {
 
             <div className="bg-white/5 rounded-2xl p-4 border border-white/5 mb-6">
                 <h3 className="font-bold text-xl mb-4 bg-clip-text text-transparent bg-gradient-to-r from-[#D4AF37] to-[#AA8C2C]">
-                    Country Hint
+                    Trending Hint By Country
                 </h3>
                 <div className="space-y-4">
                     {trendingCountries.length === 0 ? (
@@ -126,7 +126,7 @@ export const RightPanel: React.FC = () => {
                                     </div>
                                     <div className="font-bold text-white group-hover:text-[#DBBF33] transition">{item.country}</div>
                                 </div>
-                                <div className="text-xs text-gray-500 font-mono">{item.count} posts</div>
+                                <div className="text-xs text-gray-500 font-mono">{item.count} {item.count === 1 ? 'Hint' : 'Hints'}</div>
                             </div>
                         ))
                     )}
